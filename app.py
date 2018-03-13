@@ -22,7 +22,6 @@ class PartsInventory(db.Model):
     quantity_on_order = db.Column(db.Integer, unique=False)
     quantity_on_hand = db.Column(db.Integer, unique=False)
 
-
     def __init__(self, sku_number, sku_name, dimensions, price, quantity_on_order, quantity_on_hand):
         self.sku_number = sku_number
         self.sku_name = sku_name
@@ -95,7 +94,6 @@ class Schedule(db.Model):
         self.quantity = quantity
         self.expected_start = expected_start
         self.expected_completion = expected_completion
-
 
 # TODO WHEN PRODUCTION SCHEDULE IS READY
 #class Metrics(db.Model):
