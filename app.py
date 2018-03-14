@@ -2,7 +2,7 @@ import json
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 
-#from flask_heroku import Heroku
+from flask_heroku import Heroku
 
 app = Flask(__name__)
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/cs490_test'
