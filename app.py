@@ -49,11 +49,13 @@ class FloorControl(db.Model):
     __tablename__ = "floor_control"
 
     id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.String(120), unique=False)
     serial_number = db.Column(db.String(120), unique=False)
     stage = db.Column(db.Integer, unique=False)
     status = db.Column(db.Integer, unique=False)
 
-    def __init__(self, serial_number, stage, status):
+    def __init__(self, order_id, serial_number, stage, status):
+        self.order_id = order_id
         self.serial_number = serial_number
         self.stage = stage
         self.status = status
@@ -62,6 +64,7 @@ class QualityAssurance(db.Model):
     __tablename__ = "quality_assurance"
 
     id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.String(120), unique=False)
     serial_number = db.Column(db.String(120), unique=False)
     stage0 = db.Column(db.Integer, unique=False)
     stage1 = db.Column(db.Integer, unique=False)
@@ -69,7 +72,8 @@ class QualityAssurance(db.Model):
     stage3 = db.Column(db.Integer, unique=False)
     stage4 = db.Column(db.Integer, unique=False)
 
-    def __init__(self, serial_number, stage0, stage1, stage2, stage3, stage4):
+    def __init__(self, order_id, serial_number, stage0, stage1, stage2, stage3, stage4):
+        self.order_id = order_id
         self.serial_number = serial_number
         self.stage0 = stage0
         self.stage1 = stage1
@@ -94,7 +98,7 @@ class Schedule(db.Model):
         self.quantity = quantity
         self.expected_start = expected_start
         self.expected_completion = expected_completion
-	self.status = status
+        self.status = status
 
 # TODO WHEN PRODUCTION SCHEDULE IS READY
 #class Metrics(db.Model):
@@ -153,9 +157,9 @@ def populate():
             ret = FinishedGoodsInventory(data['skuNumber'], data['skuName'],
                     data['quantityInProduction'], data['quantityOnHand'])
         elif table == 'floor_control':
-            ret = FloorControl(data['serialNumber'], data['stage'], data['status'])
+            ret = FloorControl(data['orderId'], data['serialNumber'], data['stage'], data['status'])
         elif table == 'quality_assurance':
-            ret = QualityAssurance(data['serialNumber'], data['stage0'],
+            ret = QualityAssurance(data['orderId'], data['serialNumber'], data['stage0'],
                     data['stage1'], data['stage2'], data['stage3'], data['stage4'])
         elif table == 'schedule':
             ret = Schedule(data['orderId'], data['skuNumber'], data['quantity'],
