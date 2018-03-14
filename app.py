@@ -2,12 +2,12 @@ import json
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 
-from flask_heroku import Heroku
+#from flask_heroku import Heroku
 
 app = Flask(__name__)
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/cs490'
-#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-heroku = Heroku(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/cs490_test'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#heroku = Heroku(app)
 db = SQLAlchemy(app)
 
 # Create our database models
@@ -88,12 +88,13 @@ class Schedule(db.Model):
     expected_completion = db.Column(db.String(120), unique=False)
     status = db.Column(db.String(120), unique=False)
 
-    def __init__(self, order_id, sku_number, quantity, expected_start, expected_completion):
+    def __init__(self, order_id, sku_number, quantity, expected_start, expected_completion, status):
         self.order_id = order_id
         self.sku_number = sku_number
         self.quantity = quantity
         self.expected_start = expected_start
         self.expected_completion = expected_completion
+	self.status = status
 
 # TODO WHEN PRODUCTION SCHEDULE IS READY
 #class Metrics(db.Model):
