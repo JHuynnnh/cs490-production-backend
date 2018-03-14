@@ -3,8 +3,11 @@ from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 
 from flask_heroku import Heroku
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/cs490_test'
 #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 heroku = Heroku(app)
@@ -145,6 +148,7 @@ class BillOfMaterials(db.Model):
 # FOR FRONTEND
 
 @app.route('/populate', methods=['POST'])
+@cross_origin()
 def populate():
     try:
         data = request.get_json()
@@ -174,6 +178,7 @@ def populate():
         return json.dumps({"Result": "Failed to add data to table: " + table})
 
 @app.route('/delete', methods=['DELETE'])
+@cross_origin()
 def delete():
     try:
         data = request.get_json()
@@ -197,6 +202,7 @@ def delete():
         return json.dumps({"Result": "Failed to delete data from table: " + table})
 
 @app.route('/delete_all', methods=['DELETE'])
+@cross_origin()
 def delete_all():
     try:
         data = request.get_json()
@@ -220,6 +226,7 @@ def delete_all():
         return json.dumps({"Result": "Failed to delete all data from table: " + table})
 
 @app.route('/parts_inventory_all', methods=['GET'])
+@cross_origin()
 def get_all_parts_inventory():
     q = db.session.query(PartsInventory)
     ret = {}
@@ -232,6 +239,7 @@ def get_all_parts_inventory():
     return json.dumps(ret)
 
 @app.route('/finished_goods_inventory_all', methods=['GET'])
+@cross_origin()
 def get_all_finished_goods_inventory():
     q = db.session.query(FinishedGoodsInventory)
     ret = {}
@@ -242,6 +250,7 @@ def get_all_finished_goods_inventory():
     return json.dumps(ret)
 
 @app.route('/floor_control_all', methods=['GET'])
+@cross_origin()
 def get_all_floor_control():
     q = db.session.query(FloorControl)
     ret = {}
@@ -250,6 +259,7 @@ def get_all_floor_control():
     return json.dumps(ret)
 
 @app.route('/quality_assurance_all', methods=['GET'])
+@cross_origin()
 def get_all_quality_assurance():
     q = db.session.query(QualityAssurance)
     ret = {}
@@ -259,6 +269,7 @@ def get_all_quality_assurance():
     return json.dumps(ret)
 
 @app.route('/schedule_all', methods=['GET'])
+@cross_origin()
 def get_all_schedule():
     q = db.session.query(Schedule)
     ret = {}
