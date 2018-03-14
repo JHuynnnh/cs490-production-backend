@@ -91,14 +91,16 @@ class Schedule(db.Model):
     order_id = db.Column(db.String(120), unique=False)
     sku_number = db.Column(db.String(120), unique=False)
     quantity = db.Column(db.Integer, unique=False)
+    quantity_completed = db.Column(db.Integer, unique=False)
     expected_start = db.Column(db.String(120), unique=False)
     expected_completion = db.Column(db.String(120), unique=False)
     status = db.Column(db.String(120), unique=False)
 
-    def __init__(self, order_id, sku_number, quantity, expected_start, expected_completion, status):
+    def __init__(self, order_id, sku_number, quantity, quantity_completed, expected_start, expected_completion, status):
         self.order_id = order_id
         self.sku_number = sku_number
         self.quantity = quantity
+	self.quantity_completed = quantity_completed
         self.expected_start = expected_start
         self.expected_completion = expected_completion
         self.status = status
@@ -166,7 +168,7 @@ def populate():
             ret = QualityAssurance(data['orderId'], data['serialNumber'], data['stage0'],
                     data['stage1'], data['stage2'], data['stage3'], data['stage4'])
         elif table == 'schedule':
-            ret = Schedule(data['orderId'], data['skuNumber'], data['quantity'],
+            ret = Schedule(data['orderId'], data['skuNumber'], data['quantity'], data['quantityCompleted'],
                     data['expectedStart'], data['expectedCompletion'], data['status'])
         else:
             return json.dumps({"Result": "Cannot add to table: " + table})
@@ -255,7 +257,7 @@ def get_all_floor_control():
     q = db.session.query(FloorControl)
     ret = {}
     for item in q.all():
-        ret[item.serial_number] = {'stage': item.stage, 'status': item.status}
+        ret[item.serial_number] = {'orderId': item.order_id, 'stage': item.stage, 'status': item.status}
     return json.dumps(ret)
 
 @app.route('/quality_assurance_all', methods=['GET'])
@@ -264,7 +266,7 @@ def get_all_quality_assurance():
     q = db.session.query(QualityAssurance)
     ret = {}
     for item in q.all():
-        ret[item.serial_number] = {'stage0': item.stage0, 'stage1': item.stage1, 'stage2': item.stage2, 
+        ret[item.serial_number] = {'orderId': item.order_id, 'stage0': item.stage0, 'stage1': item.stage1, 'stage2': item.stage2, 
                                     'stage3': item.stage3, 'stage4': item.stage4}
     return json.dumps(ret)
 
@@ -276,6 +278,7 @@ def get_all_schedule():
     for item in q.all():
         ret[item.order_id] = {'skuNumber': item.sku_number,
                             'quantity': item.quantity,
+			    'quantityCompleted': item.quantity_completed, 
                             'expectedStart': item.expected_start,
                             'expectedCompletion': item.expected_completion,
                             'status': item.status}
