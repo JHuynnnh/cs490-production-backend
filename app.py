@@ -251,7 +251,7 @@ def get_all_floor_control():
 
 @app.route('/quality_assurance_all', methods=['GET'])
 def get_all_quality_assurance():
-    q = db.session.query(FloorControl)
+    q = db.session.query(QualityAssurance)
     ret = {}
     for item in q.all():
         ret[item.serial_number] = {'stage0': item.stage0, 'stage1': item.stage1, 'stage2': item.stage2, 
@@ -260,7 +260,7 @@ def get_all_quality_assurance():
 
 @app.route('/schedule_all', methods=['GET'])
 def get_all_schedule():
-    q = db.session.query(FloorControl)
+    q = db.session.query(Schedule)
     ret = {}
     for item in q.all():
         ret[item.order_id] = {'skuNumber': item.sku_number,
