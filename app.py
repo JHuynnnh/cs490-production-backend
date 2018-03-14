@@ -100,7 +100,7 @@ class Schedule(db.Model):
         self.order_id = order_id
         self.sku_number = sku_number
         self.quantity = quantity
-	self.quantity_completed = quantity_completed
+        self.quantity_completed = quantity_completed
         self.expected_start = expected_start
         self.expected_completion = expected_completion
         self.status = status
