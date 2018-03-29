@@ -354,7 +354,9 @@ def incFG():
     try:
         data = request.get_json()
         fg_obj = FinishedGoodsInventory.query.filter_by(sku_number=data['skuNumber']).first()
-        fg_obj.quantity_on_hand += data['amount']
+        fg_obj.quantity_on_hand += int(data['amount'])
+        db.session.commit()
+        db.session.close()
         return json.dumps({"Result": "incFG passed"})
     except:
         return json.dumps({"Result": "incFG failed"})
@@ -365,7 +367,9 @@ def incPI():
     try:
         data = request.get_json()
         pi_obj = PartsInventory.query.filter_by(sku_number=data['skuNumber']).first()
-        pi_obj.quantity_on_hand += data['amount']
+        pi_obj.quantity_on_hand += int(data['amount'])
+        db.session.commit()
+        db.session.close()
         return json.dumps({"Result": "incPI passed"})
     except:
         return json.dumps({"Result": "incPI failed"})
