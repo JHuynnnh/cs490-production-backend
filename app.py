@@ -89,6 +89,7 @@ class Schedule(db.Model):
     __tablename__ = "schedule"
 
     id = db.Column(db.Integer, primary_key=True)
+    sales_order = db.Column(db.String(120), unique=False)
     order_id = db.Column(db.String(120), unique=False)
     sku_number = db.Column(db.String(120), unique=False)
     quantity = db.Column(db.Integer, unique=False)
@@ -97,7 +98,8 @@ class Schedule(db.Model):
     expected_completion = db.Column(db.String(120), unique=False)
     status = db.Column(db.String(120), unique=False)
 
-    def __init__(self, order_id, sku_number, quantity, quantity_completed, expected_start, expected_completion, status):
+    def __init__(self, sales_order, order_id, sku_number, quantity, quantity_completed, expected_start, expected_completion, status):
+        self.sales_order = sales_order
         self.order_id = order_id
         self.sku_number = sku_number
         self.quantity = quantity
@@ -169,8 +171,8 @@ def populate():
             ret = QualityAssurance(data['orderId'], data['serialNumber'], data['stage0'],
                     data['stage1'], data['stage2'], data['stage3'], data['stage4'])
         elif table == 'schedule':
-            ret = Schedule(data['orderId'], data['skuNumber'], data['quantity'], data['quantityCompleted'],
-                    data['expectedStart'], data['expectedCompletion'], data['status'])
+            ret = Schedule(data['salesOrder'], data['orderId'], data['skuNumber'], data['quantity'], 
+                data['quantityCompleted'], data['expectedStart'], data['expectedCompletion'], data['status'])
         else:
             return json.dumps({"Result": "Cannot add to table: " + table})
         db.session.add(ret)
@@ -278,13 +280,21 @@ def get_all_schedule():
     q = db.session.query(Schedule)
     ret = {}
     for item in q.all():
-        ret[item.order_id] = {'skuNumber': item.sku_number,
+        ret[item.order_id] = {'salesOrder': item.sales_order,
+                            'skuNumber': item.sku_number,
                             'quantity': item.quantity,
                             'quantityCompleted': item.quantity_completed, 
                             'expectedStart': item.expected_start,
                             'expectedCompletion': item.expected_completion,
                             'status': item.status}
     return json.dumps(ret)
+
+product_names = {
+    "250": "Enduro 250"
+    "550": "Enduro 550"
+    "300": "Moto 300"
+    "450": "Moto 450"
+}
 
 @app.route('/doneQA', methods=['POST'])
 @cross_origin()
@@ -296,7 +306,7 @@ def doneQA():
         ps_obj.quantity_completed += 1
         fg_obj = FinishedGoodsInventory.query.filter_by(sku_number=ps_obj.sku_number).first()
         if fg_obj is None:
-            ret = FinishedGoodsInventory(ps_obj.sku_number, "Bike Model" + str(uuid.uuid4())[0:5], ps.quantity, 1)
+            ret = FinishedGoodsInventory(ps_obj.sku_number, product_names[ps_obj.sku_number[-3:]], ps.quantity-1, 1)
             db.session.add(ret)
         else:
             fg_obj.quantity_in_production -= 1
