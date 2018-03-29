@@ -290,9 +290,9 @@ def get_all_schedule():
     return json.dumps(ret)
 
 product_names = {
-    "250": "Enduro 250"
-    "550": "Enduro 550"
-    "300": "Moto 300"
+    "250": "Enduro 250",
+    "550": "Enduro 550",
+    "300": "Moto 300",
     "450": "Moto 450"
 }
 
