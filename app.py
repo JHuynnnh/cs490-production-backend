@@ -1,4 +1,5 @@
 import json
+import uuid
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 
@@ -177,6 +178,7 @@ def populate():
         db.session.close()
         return json.dumps({"Result": "Added to table: " + table})
     except:
+        raise
         return json.dumps({"Result": "Failed to add data to table: " + table})
 
 @app.route('/delete', methods=['DELETE'])
@@ -278,11 +280,85 @@ def get_all_schedule():
     for item in q.all():
         ret[item.order_id] = {'skuNumber': item.sku_number,
                             'quantity': item.quantity,
-			    'quantityCompleted': item.quantity_completed, 
+                            'quantityCompleted': item.quantity_completed, 
                             'expectedStart': item.expected_start,
                             'expectedCompletion': item.expected_completion,
                             'status': item.status}
     return json.dumps(ret)
+
+@app.route('/doneQA', methods=['POST'])
+@cross_origin()
+def doneQA():
+    try:
+        data = request.get_json()
+        qa_obj = QualityAssurance.query.filter_by(serial_number=data['serialNumber']).first()
+        ps_obj = Schedule.query.filter_by(order_id=qa_obj.order_id).first() # this order id must exist
+        ps_obj.quantity_completed += 1
+        fg_obj = FinishedGoodsInventory.query.filter_by(sku_number=ps_obj.sku_number).first()
+        if fg_obj is None:
+            ret = FinishedGoodsInventory(ps_obj.sku_number, "Bike Model" + str(uuid.uuid4())[0:5], ps.quantity, 1)
+            db.session.add(ret)
+        else:
+            fg_obj.quantity_in_production -= 1
+            fg_obj.quantity_on_hand += 1
+        QualityAssurance.query.filter_by(serial_number=data['serialNumber']).delete()
+        db.session.commit()
+        db.session.close()
+        return json.dumps({"Result": "doneQA passed"})
+    except:
+        return json.dumps({"Result": "doneQA failed"})
+
+@app.route('/scrapQA', methods=['POST'])
+@cross_origin()
+def scrapQA():
+    try:
+        data = request.get_json()
+        qa_obj = QualityAssurance.query.filter_by(serial_number=data['serialNumber']).first()
+        ret = FloorControl(qa_obj.order_id, str(uuid.uuid4())[0:8].upper() + str(uuid.uuid4())[-1].upper(), 0, 0)
+        db.session.add(ret)
+        QualityAssurance.query.filter_by(serial_number=data['serialNumber']).delete()
+        db.session.commit()
+        db.session.close()
+        return json.dumps({"Result": "scrapQA passed"})
+    except:
+        return json.dumps({"Result": "scrapQA failed"})
+
+@app.route('/scrapFC', methods=['POST'])
+@cross_origin()
+def scrapFC():
+    try:
+        data = request.get_json()
+        fc_obj = FloorControl.query.filter_by(serial_number=data['serialNumber']).first()
+        fc_obj.serial_number = str(uuid.uuid4())[0:8].upper() + str(uuid.uuid4())[-1].upper()
+        fc_obj.stage = 0
+        fc_obj.status = 0
+        db.session.commit()
+        db.session.close()
+        return json.dumps({"Result": "scrapFC passed"})
+    except:
+        return json.dumps({"Result": "scrapFC failed"})
+
+@app.route('/incFG', methods=['POST'])
+@cross_origin()
+def incFG():
+    try:
+        data = request.get_json()
+        fg_obj = FinishedGoodsInventory.query.filter_by(sku_number=data['skuNumber']).first()
+        fg_obj.quantity_on_hand += data['amount']
+        return json.dumps({"Result": "incFG passed"})
+    except:
+        return json.dumps({"Result": "incFG failed"})
+
+@app.route('/incPI', methods=['POST'])
+@cross_origin()
+def incPI():
+    try:
+        data = request.get_json()
+        pi_obj = PartsInventory.query.filter_by(sku_number=data['skuNumber']).first()
+        pi_obj.quantity_on_hand += data['amount']
+        return json.dumps({"Result": "incPI passed"})
+    except:
+        return json.dumps({"Result": "incPI failed"})
 
 # FOR FRONTEND
 #########################################################################################
