@@ -313,7 +313,7 @@ def doneQA():
             fg_obj.quantity_in_production -= 1
             fg_obj.quantity_on_hand += 1
 
-        if fg_obj.quantity_in_production == fg_obj.quantity_on_hand:
+        if ps_obj.quantity == ps_obj.quantity_completed:
             ps_obj.status = "Completed"
         else:
             ps_obj.status = "In Production"
