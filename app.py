@@ -321,7 +321,7 @@ def doneQA():
         QualityAssurance.query.filter_by(serial_number=data['serialNumber']).delete()
         db.session.commit()
         db.session.close()
-        return json.dumps({"result": "doneQA passed", "quantityCompleted": ps.obj.quantity_completed})
+        return json.dumps({"result": "doneQA passed", "quantityCompleted": ps_obj.quantity_completed})
     except:
         return json.dumps({"result": "doneQA failed"})
 
