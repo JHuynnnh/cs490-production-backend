@@ -384,7 +384,7 @@ def incPI():
 # FOR FRONTEND
 #########################################################################################
 
-@app.route('/events')
+@app.route('/events', methods=['POST'])
 @cross_origin()
 def events():
     data = request.get_json()
