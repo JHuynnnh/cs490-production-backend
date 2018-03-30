@@ -274,7 +274,7 @@ def get_all_quality_assurance():
                                     'stage3': item.stage3, 'stage4': item.stage4}
     return json.dumps(ret)
 
-@app.route('/schedule_all', methods=['GET'])
+@app.route('/schedule_internal_all', methods=['GET'])
 @cross_origin()
 def get_all_schedule():
     q = db.session.query(Schedule)
@@ -305,12 +305,19 @@ def doneQA():
         ps_obj = Schedule.query.filter_by(order_id=qa_obj.order_id).first() # this order id must exist
         ps_obj.quantity_completed += 1
         fg_obj = FinishedGoodsInventory.query.filter_by(sku_number=ps_obj.sku_number).first()
+
         if fg_obj is None:
             ret = FinishedGoodsInventory(ps_obj.sku_number, product_names[ps_obj.sku_number[-3:]], ps.quantity-1, 1)
             db.session.add(ret)
         else:
             fg_obj.quantity_in_production -= 1
             fg_obj.quantity_on_hand += 1
+
+        if fg_obj.quantity_in_production == fg_obj.quantity_on_hand:
+            ps_obj.status = "Completed"
+        else:
+            ps_obj.status = "In Production"
+
         QualityAssurance.query.filter_by(serial_number=data['serialNumber']).delete()
         db.session.commit()
         db.session.close()
