@@ -307,7 +307,7 @@ def doneQA():
         fg_obj = FinishedGoodsInventory.query.filter_by(sku_number=ps_obj.sku_number).first()
 
         if fg_obj is None:
-            ret = FinishedGoodsInventory(ps_obj.sku_number, product_names[ps_obj.sku_number[-3:]], ps.quantity-1, 1)
+            ret = FinishedGoodsInventory(ps_obj.sku_number, product_names[ps_obj.sku_number[-3:]], ps_obj.quantity-1, 1)
             db.session.add(ret)
         else:
             fg_obj.quantity_in_production -= 1
