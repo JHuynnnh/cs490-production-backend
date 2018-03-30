@@ -174,14 +174,14 @@ def populate():
             ret = Schedule(data['salesOrder'], data['orderId'], data['skuNumber'], data['quantity'], 
                 data['quantityCompleted'], data['expectedStart'], data['expectedCompletion'], data['status'])
         else:
-            return json.dumps({"Result": "Cannot add to table: " + table})
+            return json.dumps({"result": "Cannot add to table: " + table})
         db.session.add(ret)
         db.session.commit()
         db.session.close()
-        return json.dumps({"Result": "Added to table: " + table})
+        return json.dumps({"result": "Added to table: " + table})
     except:
         raise
-        return json.dumps({"Result": "Failed to add data to table: " + table})
+        return json.dumps({"result": "Failed to add data to table: " + table})
 
 @app.route('/delete', methods=['DELETE'])
 @cross_origin()
@@ -200,12 +200,12 @@ def delete():
         elif table == 'schedule':
             obj = Schedule.query.filter_by(order_id=data['orderId']).delete()
         else:
-            return json.dumps({"Result": "Cannot delete from table: " + table})
+            return json.dumps({"result": "Cannot delete from table: " + table})
         db.session.commit()
         db.session.close()
-        return json.dumps({"Result": "Deleted row from table: " + table})
+        return json.dumps({"result": "Deleted row from table: " + table})
     except:
-        return json.dumps({"Result": "Failed to delete data from table: " + table})
+        return json.dumps({"result": "Failed to delete data from table: " + table})
 
 @app.route('/delete_all', methods=['DELETE'])
 @cross_origin()
@@ -224,12 +224,12 @@ def delete_all():
         elif table == 'schedule':
             db.session.query(Schedule).delete()
         else:
-            return json.dumps({"Result": "Cannot delete rows from table: " + table})
+            return json.dumps({"result": "Cannot delete rows from table: " + table})
         db.session.commit()
         db.session.close()
-        return json.dumps({"Result": "Deleted all rows from table: " + table})
+        return json.dumps({"result": "Deleted all rows from table: " + table})
     except:
-        return json.dumps({"Result": "Failed to delete all data from table: " + table})
+        return json.dumps({"result": "Failed to delete all data from table: " + table})
 
 @app.route('/parts_inventory_all', methods=['GET'])
 @cross_origin()
@@ -321,9 +321,9 @@ def doneQA():
         QualityAssurance.query.filter_by(serial_number=data['serialNumber']).delete()
         db.session.commit()
         db.session.close()
-        return json.dumps({"Result": "doneQA passed"})
+        return json.dumps({"result": "doneQA passed", "quantityCompleted": ps.obj.quantity_completed})
     except:
-        return json.dumps({"Result": "doneQA failed"})
+        return json.dumps({"result": "doneQA failed"})
 
 @app.route('/scrapQA', methods=['POST'])
 @cross_origin()
@@ -336,9 +336,9 @@ def scrapQA():
         QualityAssurance.query.filter_by(serial_number=data['serialNumber']).delete()
         db.session.commit()
         db.session.close()
-        return json.dumps({"Result": "scrapQA passed"})
+        return json.dumps({"result": "scrapQA passed"})
     except:
-        return json.dumps({"Result": "scrapQA failed"})
+        return json.dumps({"result": "scrapQA failed"})
 
 @app.route('/scrapFC', methods=['POST'])
 @cross_origin()
@@ -351,9 +351,9 @@ def scrapFC():
         fc_obj.status = 0
         db.session.commit()
         db.session.close()
-        return json.dumps({"Result": "scrapFC passed"})
+        return json.dumps({"result": "scrapFC passed"})
     except:
-        return json.dumps({"Result": "scrapFC failed"})
+        return json.dumps({"result": "scrapFC failed"})
 
 @app.route('/incFG', methods=['POST'])
 @cross_origin()
@@ -364,9 +364,9 @@ def incFG():
         fg_obj.quantity_on_hand += int(data['amount'])
         db.session.commit()
         db.session.close()
-        return json.dumps({"Result": "incFG passed"})
+        return json.dumps({"result": "incFG passed"})
     except:
-        return json.dumps({"Result": "incFG failed"})
+        return json.dumps({"result": "incFG failed"})
 
 @app.route('/incPI', methods=['POST'])
 @cross_origin()
@@ -377,9 +377,9 @@ def incPI():
         pi_obj.quantity_on_hand += int(data['amount'])
         db.session.commit()
         db.session.close()
-        return json.dumps({"Result": "incPI passed"})
+        return json.dumps({"result": "incPI passed"})
     except:
-        return json.dumps({"Result": "incPI failed"})
+        return json.dumps({"result": "incPI failed"})
 
 # FOR FRONTEND
 #########################################################################################
@@ -388,8 +388,7 @@ def incPI():
 @cross_origin()
 def events():
     data = request.get_json()
-    print(data)
-    print("here")
+    print(data) #works
     return json.dumps({"result": "received event"})
 
 #########################################################################################
