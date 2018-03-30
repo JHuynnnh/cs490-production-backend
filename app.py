@@ -382,6 +382,7 @@ def incPI():
 def events():
     data = request.get_json()
     print(data['data']['items'])
+    return json.dumps({"result": "received event"})
 
 #########################################################################################
 
