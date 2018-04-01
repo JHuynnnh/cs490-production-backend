@@ -277,7 +277,7 @@ def get_all_quality_assurance():
 
 @app.route('/schedule_internal_all', methods=['GET'])
 @cross_origin()
-def get_all_schedule():
+def get_all_schedule_internal():
     q = db.session.query(Schedule)
     ret = {}
     for item in q.all():
@@ -425,6 +425,28 @@ def events():
         return json.dumps({"result": "successfully processed order"})
     except:
         return json.dumps({"result": "failed to process order"})
+
+@app.route('/schedule_all', methods=['GET'])
+@cross_origin()
+def get_all_schedule():
+    q = db.session.query(Schedule)
+    ret = {}
+    for item in q.all():
+        if ret.has_key(item.sales_order):  
+            ret[item.sales_order] += [{'skuNumber': item.sku_number,
+                                'quantity': item.quantity,
+                                'quantityCompleted': item.quantity_completed, 
+                                'expectedStart': item.expected_start,
+                                'expectedCompletion': item.expected_completion,
+                                'status': item.status}]
+        else:
+            ret[item.sales_order] = [{'skuNumber': item.sku_number,
+                                'quantity': item.quantity,
+                                'quantityCompleted': item.quantity_completed, 
+                                'expectedStart': item.expected_start,
+                                'expectedCompletion': item.expected_completion,
+                                'status': item.status}]
+    return json.dumps(ret)
 
 @app.route('/hr', methods=['POST'])
 @cross_origin()
