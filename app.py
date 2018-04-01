@@ -388,7 +388,7 @@ def incPI():
 @cross_origin()
 def events():
     data = request.get_json()
-    print(data) #works
+    print(data['data']['items'])
     return json.dumps({"result": "received event"})
 
 #########################################################################################
