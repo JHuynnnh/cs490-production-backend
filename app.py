@@ -1,5 +1,6 @@
 import json
 import uuid
+import random
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 
@@ -384,12 +385,51 @@ def incPI():
 # FOR FRONTEND
 #########################################################################################
 
+year = 2018
+month = 4
 @app.route('/events', methods=['POST'])
 @cross_origin()
 def events():
-    data = request.get_json()
-    print(data['data']['items'])
-    return json.dumps({"result": "received event"})
+    try:
+        data = request.get_json()
+        orderID = data['data']['orderID']
+        items = data['data']['items']
+        for item in items:
+            new_month = month+(item['quantity']/2 + 1)
+            completion_month = new_month
+            day = str(random.randint(10, 28))
+
+            if month < 10:
+                month = "0"+str(month)
+            else:
+                month = str(month)
+
+            if completion_month < 10:
+                completion_month = "0"+str(completion_month)
+            else:
+                completion_month = str(completion_month)
+
+            ret = Schedule(str(orderID), str(orderID) + '-' + item['model'][-3:], "0000000" + item['model'][-3:],
+                item['quantity'], 0, str(year)+"-"+month+"-"+day, str(year)+"-"+completion_month+"-"+day, "Not Started")
+            db.session.add(ret)
+            db.session.commit()
+            ret = FloorControl(str(orderID) + '-' + item['model'][-3:], str(uuid.uuid4())[0:8].upper() + str(uuid.uuid4())[-1].upper(), 0, 0)
+            db.session.add(ret)
+            db.session.commit()
+            if new_month > 12:
+                month = new_month % 12
+                year += 1
+            else:
+                month = new_month
+        db.session.close()
+        return json.dumps({"result": "successfully processed order"})
+    except:
+        return json.dumps({"result": "failed to process order"})
+
+@app.route('/hr', methods=['POST'])
+@cross_origin()
+def hr():
+    return json.dumps({"result": "received data"})
 
 #########################################################################################
 
