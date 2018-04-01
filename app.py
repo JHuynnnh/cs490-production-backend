@@ -432,7 +432,7 @@ def get_all_schedule():
     q = db.session.query(Schedule)
     ret = {}
     for item in q.all():
-        if ret.has_key(item.sales_order):  
+        if item.sales_order in ret:  
             ret[item.sales_order] += [{'skuNumber': item.sku_number,
                                 'quantity': item.quantity,
                                 'quantityCompleted': item.quantity_completed, 
