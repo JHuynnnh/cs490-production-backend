@@ -382,6 +382,22 @@ def incPI():
     except:
         return json.dumps({"result": "incPI failed"})
 
+@app.route('/usePart', methods=['POST'])
+@cross_origin()
+def usePart():
+    try:
+        data = request.get_json()
+        pi_obj = PartsInventory.query.filter_by(sku_number=data['skuNumber']).first()
+        if pi_obj.quantity_on_hand == 0:
+            pi_obj.quantity_on_hand = 10
+        else:
+            pi_obj.quantity_on_hand -= 1
+        db.session.commit()
+        db.session.close()
+        return json.dumps({"result": "usePart passed"})
+    except:
+        return json.dumps({"result": "usePart failed"})
+        
 # FOR FRONTEND
 #########################################################################################
 
