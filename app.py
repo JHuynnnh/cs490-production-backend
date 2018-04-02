@@ -389,7 +389,7 @@ def usePart():
         data = request.get_json()
         pi_obj = PartsInventory.query.filter_by(sku_number=data['skuNumber']).first()
         if pi_obj.quantity_on_hand == 0:
-            pi_obj.quantity_on_hand = 10
+            pi_obj.quantity_on_hand = random.randint(5, 20)
         else:
             pi_obj.quantity_on_hand -= 1
         db.session.commit()
