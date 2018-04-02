@@ -397,7 +397,7 @@ def events():
         orderID = data['data']['orderID']
         items = data['data']['items']
         for item in items:
-            new_month = month+(item['quantity']/2 + 1)
+            new_month = month+(item['quantity']//2 + 1)
             completion_month = new_month
             day = str(random.randint(10, 28))
 
