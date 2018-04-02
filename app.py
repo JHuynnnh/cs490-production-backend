@@ -385,8 +385,8 @@ def incPI():
 # FOR FRONTEND
 #########################################################################################
 
-year = 2018
-month = 4
+global year = 2018
+global month = 4
 @app.route('/events', methods=['POST'])
 @cross_origin()
 def events():
