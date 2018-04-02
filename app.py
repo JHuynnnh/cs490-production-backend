@@ -414,7 +414,10 @@ def events():
         items = data['data']['items']
         for item in items:
             new_month = month+(item['quantity']//2 + 1)
-            completion_month = new_month
+            if new_month > 12:
+                completion_month = new_month % 12
+            else:
+                completion_month = new_month
             day = str(random.randint(10, 28))
 
             if month < 10:
